@@ -1,8 +1,11 @@
+"use client";
+
 import { useState } from 'react';
 import type { CountdownEvent } from '../types';
 import { getUserTimezone } from '../utils/time';
 import { Rocket, Edit3 } from 'lucide-react';
 import Select from 'react-select';
+import { useSession } from 'next-auth/react';
 
 interface Props {
   initialEvent?: CountdownEvent;
@@ -88,8 +91,10 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
   const [timeStr, setTimeStr] = useState(initialTime);
   const [timezone, setTimezone] = useState(initialEvent?.timezone || getUserTimezone());
   const [placeholderText] = useState(() => PLACEHOLDER_IDEAS[Math.floor(Math.random() * PLACEHOLDER_IDEAS.length)]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: session } = useSession();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dateStr || !timezone) return;
     
@@ -97,11 +102,34 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
     const finalTime = timeStr || '00:00';
     const targetDate = `${dateStr}T${finalTime}`;
 
-    onSubmit({
-      name,
-      targetDate,
-      timezone,
-    });
+    setIsSubmitting(true);
+
+    if (session?.user) {
+      try {
+        const { createEvent } = await import('../app/actions');
+        const newEvent = await createEvent({
+          title: name,
+          targetDate,
+          timezone,
+        });
+        
+        // Let the parent know it should redirect or show the short link
+        onSubmit({
+          name,
+          targetDate,
+          timezone,
+          shortCode: newEvent.shortCode
+        });
+      } catch (err) {
+        console.error("Failed to save event", err);
+        alert('Failed to save event. Falling back to local offline mode.');
+        onSubmit({ name, targetDate, timezone });
+      }
+    } else {
+      onSubmit({ name, targetDate, timezone });
+    }
+    
+    setIsSubmitting(false);
   };
 
   return (
@@ -189,9 +217,9 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
           </p>
         </div>
 
-        <button type="submit" className="btn-primary" style={{ marginTop: '1rem', width: '100%', padding: '1rem', fontSize: '1.1rem' }}>
+        <button disabled={isSubmitting} type="submit" className="btn-primary" style={{ marginTop: '1rem', width: '100%', padding: '1rem', fontSize: '1.1rem', opacity: isSubmitting ? 0.7 : 1 }}>
           {initialEvent ? <Edit3 size={20} /> : <Rocket size={20} />}
-          {initialEvent ? 'Save Changes' : "Start Countdown"}
+          {isSubmitting ? 'Saving...' : initialEvent ? 'Save Changes' : "Start Countdown"}
         </button>
       </form>
     </div>

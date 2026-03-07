@@ -1,73 +1,49 @@
-# React + TypeScript + Vite
+# Countdown Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack countdown application powered by Next.js, Prisma, and NextAuth. It allows users to track upcoming events and share them via short links.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js >= 18
+- npm
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Clone the repository and install dependencies:**
 
-## Expanding the ESLint configuration
+   ```bash
+   pnpm install
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. **Configure environment variables:**
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+   Copy the sample environment file to `.env`:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+   ```bash
+   cp .env.example .env
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+   Fill in the required values in your `.env` file, specifically your `GITHUB_ID` and `GITHUB_SECRET`. You can generate these by creating a new OAuth Apps in your GitHub developer settings. Set the authorization callback URL to `http://localhost:3000/api/auth/callback/github`.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+3. **Initialize the Database:**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+   We use a local SQLite database for development. Create the database schema by running:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+   ```bash
+   pnpm prisma db push
+   ```
+
+4. **Start the Development Server:**
+
+   ```bash
+   pnpm run dev
+   ```
+
+   The application will be available at [http://localhost:3000](http://localhost:3000).
+
+## Features
+
+- **Offline Support**: Create temporary countdowns directly from URL parameters without an account for offline usage.
+- **User Accounts**: Login securely with GitHub to save, manage, and share events.
+- **Short Links**: Share countdowns with others via persistent short links (`/c/[shortCode]`) that fetch from the database.
+- **Premium UI**: Uses a glassmorphism design with neat and dynamic gradients.

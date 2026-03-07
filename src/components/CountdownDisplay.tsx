@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import type { CountdownEvent, RemainingTime } from '../types';
 import { calculateRemainingTime } from '../utils/time';

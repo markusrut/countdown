@@ -1,15 +1,20 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import type { CountdownEvent } from './types';
-import { encodeEventState, decodeEventState } from './utils/url';
-import { EventForm } from './components/EventForm';
-import { CountdownDisplay } from './components/CountdownDisplay';
+import type { CountdownEvent } from '../types';
+import { encodeEventState, decodeEventState } from '../utils/url';
+import { EventForm } from '../components/EventForm';
+import { CountdownDisplay } from '../components/CountdownDisplay';
+import { AuthButton } from '../components/AuthButton';
 import { ArrowLeft } from 'lucide-react';
 
-function App() {
+export default function Home() {
   const [activeEvent, setActiveEvent] = useState<CountdownEvent | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     // Read state from URL hash on mount and when hash changes
     const readStateFromUrl = () => {
       const hash = window.location.hash;
@@ -40,8 +45,14 @@ function App() {
     setIsEditing(false);
   };
 
+  // Prevent hydration mismatch by returning null until client-side code runs
+  if (!isClient) return null;
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}>
+        <AuthButton />
+      </div>
       {activeEvent && !isEditing ? (
         <CountdownDisplay 
           event={activeEvent} 
@@ -66,5 +77,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
