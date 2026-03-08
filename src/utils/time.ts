@@ -42,3 +42,30 @@ export const calculateRemainingTime = (
 export const getUserTimezone = (): string => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
+
+/**
+ * Formats the fallback title for a countdown, omitting the time if it is exactly 00:00 midnight.
+ */
+export const formatFallbackTitle = (targetDate: string | Date, timezone: string): string => {
+  const date = new Date(targetDate);
+  const fullFormat = new Intl.DateTimeFormat('en-US', { 
+    month: 'long', 
+    day: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: false, 
+    timeZone: timezone 
+  }).format(date).replace(',', '');
+
+  // If the time is exactly midnight, just return the date portion.
+  // Note: some browsers might format midnight as "24:00" in hour12: false.
+  if (fullFormat.endsWith(' 00:00') || fullFormat.endsWith(' 24:00')) {
+    return new Intl.DateTimeFormat('en-US', { 
+      month: 'long', 
+      day: 'numeric', 
+      timeZone: timezone 
+    }).format(date);
+  }
+  
+  return fullFormat;
+};

@@ -50,8 +50,9 @@ extraOptions.forEach(opt => {
   }
 });
 
-const getTodayDateString = () => {
+const getTomorrowDateString = () => {
   const d = new Date();
+  d.setDate(d.getDate() + 1);
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
@@ -93,7 +94,7 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
 
   useEffect(() => {
     // If initialEvent exists, parse date and time out of targetDate ("YYYY-MM-DDTHH:mm")
-    const initDate = initialEvent ? initialEvent.targetDate.split('T')[0] : getTodayDateString();
+    const initDate = initialEvent ? initialEvent.targetDate.split('T')[0] : getTomorrowDateString();
     const initTime = initialEvent && initialEvent.targetDate.includes('T') ? initialEvent.targetDate.split('T')[1] : '00:00';
     
     setDateStr(initDate);

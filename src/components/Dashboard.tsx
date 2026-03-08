@@ -11,7 +11,7 @@ import { MiniCountdown } from './MiniCountdown';
 import { ShareModal } from './ShareModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { Header } from './Header';
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatFallbackTitle } from '../utils/time';
 
 type DbEvent = {
   id: string;
@@ -176,7 +176,7 @@ export const Dashboard = () => {
               
               <div style={{ flex: '1 1 auto', minWidth: 0 }}>
                  <h3 style={{ margin: '0 0 0.25rem 0', fontSize: '1.2rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {event.title || new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: event.timezone }).format(new Date(event.targetDate)).replace(',', '')}
+                  {event.title || formatFallbackTitle(event.targetDate, event.timezone)}
                 </h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>

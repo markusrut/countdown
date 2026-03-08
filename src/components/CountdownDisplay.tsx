@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import type { CountdownEvent, RemainingTime } from '../types';
 import { calculateRemainingTime } from '../utils/time';
+import { formatFallbackTitle } from '../utils/time';
 import { Calendar, Copy, Check, ArrowLeft, Edit3 } from 'lucide-react';
 
 interface Props {
@@ -86,11 +87,9 @@ export const CountdownDisplay = ({ event, shareUrl, actionButtons }: Props) => {
             {actionButtons}
           </div>
         )}
-        {event.name && (
-          <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', fontWeight: 700 }}>
-            {event.name}
-          </h1>
-        )}
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', fontWeight: 700 }}>
+          {event.name || (isClient ? formatFallbackTitle(event.targetDate, event.timezone) : '')}
+        </h1>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: 'var(--text-secondary)', marginBottom: '3rem' }}>
           <Calendar size={18} />
