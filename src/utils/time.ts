@@ -15,11 +15,7 @@ export const calculateRemainingTime = (
   eventTimezone: string
 ): RemainingTime => {
   const now = new Date();
-  
-  // The targetDateStr usually comes from a datetime-local input, 
-  // which does not have timezone information. We treat it as wall-clock time
-  // in the specified eventTimezone.
-  const targetDateInTz = fromZonedTime(targetDateStr, eventTimezone);
+  const targetDateInTz = new Date(targetDateStr);
   
   const isPast = isBefore(targetDateInTz, now);
   

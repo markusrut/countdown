@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation';
-import { CountdownDisplay } from '../../../components/CountdownDisplay';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { AuthButton } from '../../../components/AuthButton';
+import { Header } from '../../../components/Header';
+import { PublicCountdownView } from '../../../components/PublicCountdownView';
+import { getServerSession } from 'next-auth';
+import { GET } from '../../api/auth/[...nextauth]/route';
+import { getClientId } from '../../../lib/cookies';
+import { checkIsSaved } from '../../actions';
 
 export default async function ShortLinkPage({ params }: { params: { shortCode: string } }) {
   const { prisma } = await import('../../../lib/prisma');
@@ -16,35 +18,47 @@ export default async function ShortLinkPage({ params }: { params: { shortCode: s
     notFound();
   }
 
+  const session = await getServerSession(GET as any) as any;
+  const cookieClientId = await getClientId();
+  
+  let isOwner = false;
+  let isLoggedIn = false;
+  
+  if (session?.user?.email) {
+    isLoggedIn = true;
+    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (user && event.userId === user.id) {
+      isOwner = true;
+    }
+  } else if (cookieClientId && event.clientId === cookieClientId) {
+    isOwner = true;
+  }
+
+  const isSaved = isLoggedIn && !isOwner ? await checkIsSaved(event.id) : false;
+
   // Convert Prisma Event to the frontend CountdownEvent type expectation
   const eventData = {
     name: event.title,
-    // Truncate milliseconds and 'Z' if present, to simulate the local format
-    targetDate: event.targetDate.toISOString().split('.')[0], 
-    timezone: event.timezone
+    // Pass the absolute UTC date string directly
+    targetDate: event.targetDate.toISOString(), 
+    timezone: event.timezone,
+    shortCode: event.shortCode
   };
 
   const shareUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/c/${shortCode}`;
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-      <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}>
-        <AuthButton />
-      </div>
-      <CountdownDisplay 
-        event={eventData} 
-        onReset={() => {}} // Disabled the native reset in direct link mode to prevent awkward clearing behavior
-        onEdit={() => {}} // Read-only for visitors 
-        shareUrl={shareUrl} 
-      />
-      <div style={{ marginTop: '2rem' }}>
-        <Link 
-          href="/" 
-          className="btn-primary" 
-          style={{ background: 'transparent', boxShadow: 'none', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-        >
-          <ArrowLeft size={18} /> Create Your Own
-        </Link>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Header />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '100px 2rem 2rem 2rem' }}>
+        <PublicCountdownView 
+          eventData={eventData}
+          eventId={event.id}
+          shareUrl={shareUrl}
+          isOwner={isOwner}
+          isLoggedIn={isLoggedIn}
+          initialIsSaved={isSaved}
+        />
       </div>
     </div>
   );

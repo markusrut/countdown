@@ -38,14 +38,15 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  events        Event[]
+  id               String           @id @default(cuid())
+  name             String?
+  email            String?          @unique
+  emailVerified    DateTime?
+  image            String?
+  accounts         Account[]
+  sessions         Session[]
+  events           Event[]
+  savedCountdowns  SavedCountdown[]
 }
 
 model VerificationToken {
@@ -63,7 +64,24 @@ model Event {
   targetDate DateTime
   timezone   String
   shortCode  String   @unique
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  userId     String?
+  clientId   String?
+  
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
+  
+  savedBy    SavedCountdown[]
+}
+
+model SavedCountdown {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
 }

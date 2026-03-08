@@ -7,20 +7,21 @@ import { Calendar, Copy, Check, ArrowLeft, Edit3 } from 'lucide-react';
 
 interface Props {
   event: CountdownEvent;
-  onReset: () => void;
-  onEdit: () => void;
   shareUrl: string;
+  actionButtons?: React.ReactNode;
 }
 
 const formatNumber = (num: number) => num.toString().padStart(2, '0');
 
-export const CountdownDisplay = ({ event, onReset, onEdit, shareUrl }: Props) => {
+export const CountdownDisplay = ({ event, shareUrl, actionButtons }: Props) => {
+  const [isClient, setIsClient] = useState(false);
   const [timeLeft, setTimeLeft] = useState<RemainingTime>(
     calculateRemainingTime(event.targetDate, event.timezone)
   );
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const timer = setInterval(() => {
       setTimeLeft(calculateRemainingTime(event.targetDate, event.timezone));
     }, 1000);
@@ -78,24 +79,13 @@ export const CountdownDisplay = ({ event, onReset, onEdit, shareUrl }: Props) =>
 
   return (
     <div className="animate-fade-in" style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-        <button 
-          onClick={onReset}
-          className="btn-primary" 
-          style={{ background: 'transparent', boxShadow: 'none', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)' }}
-        >
-          <ArrowLeft size={18} /> Create Another
-        </button>
-        <button 
-          onClick={onEdit}
-          className="btn-primary" 
-          style={{ background: 'rgba(255, 255, 255, 0.05)', boxShadow: 'none', border: '1px solid var(--glass-border)', color: 'var(--text-primary)' }}
-        >
-          <Edit3 size={18} /> Edit This Event
-        </button>
-      </div>
-
-      <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center' }}>
+      <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', position: 'relative' }}>
+        
+        {actionButtons && (
+          <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end', zIndex: 10 }}>
+            {actionButtons}
+          </div>
+        )}
         {event.name && (
           <h1 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '1rem' }}>
             {event.name}
@@ -104,14 +94,17 @@ export const CountdownDisplay = ({ event, onReset, onEdit, shareUrl }: Props) =>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: 'var(--text-secondary)', marginBottom: '3rem' }}>
           <Calendar size={18} />
-          <span>{new Date(event.targetDate).toLocaleString()}</span>
+          <span>{isClient ? new Intl.DateTimeFormat('en-US', {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+            timeZone: event.timezone
+          }).format(new Date(event.targetDate)) : ''}</span>
           <span style={{ margin: '0 0.5rem' }}>•</span>
           <span>{event.timezone}</span>
         </div>
 
-
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          {timeBlocks.map((block, index) => {
+          {isClient && timeBlocks.map((block, index) => {
             // Find the index of the first block that actually renders (is not filtered out)
             // But since timeBlocks IS the filtered array, the first element is index 0.
             const isLargestUnit = index === 0;

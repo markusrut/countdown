@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CountdownEvent } from '../types';
 import { getUserTimezone } from '../utils/time';
 import { Rocket, Edit3 } from 'lucide-react';
@@ -82,17 +82,31 @@ const PLACEHOLDER_IDEAS = [
 ];
 
 export const EventForm = ({ initialEvent, onSubmit }: Props) => {
-  // If initialEvent exists, parse date and time out of targetDate ("YYYY-MM-DDTHH:mm")
-  const initialDate = initialEvent ? initialEvent.targetDate.split('T')[0] : getTodayDateString();
-  const initialTime = initialEvent && initialEvent.targetDate.includes('T') ? initialEvent.targetDate.split('T')[1] : '00:00';
-
   const [name, setName] = useState(initialEvent?.name || '');
-  const [dateStr, setDateStr] = useState(initialDate);
-  const [timeStr, setTimeStr] = useState(initialTime);
-  const [timezone, setTimezone] = useState(initialEvent?.timezone || getUserTimezone());
-  const [placeholderText] = useState(() => PLACEHOLDER_IDEAS[Math.floor(Math.random() * PLACEHOLDER_IDEAS.length)]);
+  const [dateStr, setDateStr] = useState('');
+  const [timeStr, setTimeStr] = useState('');
+  const [timezone, setTimezone] = useState('');
+  const [placeholderText, setPlaceholderText] = useState('My Countdown');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const { data: session } = useSession();
+
+  useEffect(() => {
+    // If initialEvent exists, parse date and time out of targetDate ("YYYY-MM-DDTHH:mm")
+    const initDate = initialEvent ? initialEvent.targetDate.split('T')[0] : getTodayDateString();
+    const initTime = initialEvent && initialEvent.targetDate.includes('T') ? initialEvent.targetDate.split('T')[1] : '00:00';
+    
+    setDateStr(initDate);
+    setTimeStr(initTime);
+    setTimezone(initialEvent?.timezone || getUserTimezone());
+    setPlaceholderText(PLACEHOLDER_IDEAS[Math.floor(Math.random() * PLACEHOLDER_IDEAS.length)]);
+    setIsMounted(true);
+  }, [initialEvent]);
+
+  // Prevent rendering form elements that rely on variable state until mounted
+  if (!initialEvent && !isMounted) {
+    return <div className="animate-fade-in glass-panel" style={{ maxWidth: '600px', width: '100%', margin: '0 auto', padding: '2.5rem', minHeight: '400px' }}></div>;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +118,7 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
 
     setIsSubmitting(true);
 
-    if (session?.user) {
+    if (!initialEvent) {
       try {
         const { createEvent } = await import('../app/actions');
         const newEvent = await createEvent({
@@ -113,7 +127,6 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
           timezone,
         });
         
-        // Let the parent know it should redirect or show the short link
         onSubmit({
           name,
           targetDate,
@@ -122,10 +135,10 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
         });
       } catch (err) {
         console.error("Failed to save event", err);
-        alert('Failed to save event. Falling back to local offline mode.');
-        onSubmit({ name, targetDate, timezone });
+        alert('Failed to save countdown. Please try again.');
       }
     } else {
+      // Editing an existing event (Dashboard handles the actual update action)
       onSubmit({ name, targetDate, timezone });
     }
     
@@ -176,42 +189,46 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
 
         <div>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Target Timezone</label>
-          <Select
-            options={TIMEZONE_OPTIONS}
-            value={TIMEZONE_OPTIONS.find(opt => opt.value === timezone)}
-            onChange={(selected) => setTimezone(selected?.value || getUserTimezone())}
-            styles={{
-              control: (base, state) => ({
-                ...base,
-                background: 'rgba(0, 0, 0, 0.2)',
-                borderColor: state.isFocused ? 'var(--color-primary)' : 'var(--glass-border)',
-                boxShadow: state.isFocused ? '0 0 0 2px var(--color-primary-glow)' : 'none',
-                minHeight: '46px',
-                borderRadius: 'var(--radius-md)',
-              }),
-              singleValue: (base) => ({
-                ...base,
-                color: 'var(--text-primary)',
-              }),
-              input: (base) => ({
-                ...base,
-                color: 'var(--text-primary)'
-              }),
-              menu: (base) => ({
-                ...base,
-                background: '#111827',
-                border: '1px solid var(--glass-border)',
-                borderRadius: 'var(--radius-md)',
-                color: 'white'
-              }),
-              option: (base, state) => ({
-                ...base,
-                background: state.isFocused ? 'rgba(139, 92, 246, 0.2)' : 'transparent',
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-              })
-            }}
-          />
+          {isMounted ? (
+            <Select
+              options={TIMEZONE_OPTIONS}
+              value={TIMEZONE_OPTIONS.find(opt => opt.value === timezone)}
+              onChange={(selected) => setTimezone(selected?.value || getUserTimezone())}
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  background: 'rgba(0, 0, 0, 0.2)',
+                  borderColor: state.isFocused ? 'var(--color-primary)' : 'var(--glass-border)',
+                  boxShadow: state.isFocused ? '0 0 0 2px var(--color-primary-glow)' : 'none',
+                  minHeight: '46px',
+                  borderRadius: 'var(--radius-md)',
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  color: 'var(--text-primary)',
+                }),
+                input: (base) => ({
+                  ...base,
+                  color: 'var(--text-primary)'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  background: '#111827',
+                  border: '1px solid var(--glass-border)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'white'
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  background: state.isFocused ? 'rgba(139, 92, 246, 0.2)' : 'transparent',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                })
+              }}
+            />
+          ) : (
+            <div style={{ height: '46px', width: '100%', background: 'rgba(0, 0, 0, 0.2)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-md)' }} />
+          )}
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
             Search for locations e.g. "CET", "Europe/London", "America/New_York".
           </p>
