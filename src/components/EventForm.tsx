@@ -197,11 +197,12 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
               styles={{
                 control: (base, state) => ({
                   ...base,
-                  background: 'rgba(0, 0, 0, 0.2)',
-                  borderColor: state.isFocused ? 'var(--color-primary)' : 'var(--glass-border)',
-                  boxShadow: state.isFocused ? '0 0 0 2px var(--color-primary-glow)' : 'none',
+                  background: 'var(--bg-base)',
+                  borderColor: state.isFocused ? 'var(--text-secondary)' : 'var(--glass-border)',
+                  boxShadow: 'none',
                   minHeight: '46px',
                   borderRadius: 'var(--radius-md)',
+                  transition: 'all var(--transition-fast)'
                 }),
                 singleValue: (base) => ({
                   ...base,
@@ -213,21 +214,25 @@ export const EventForm = ({ initialEvent, onSubmit }: Props) => {
                 }),
                 menu: (base) => ({
                   ...base,
-                  background: '#111827',
+                  background: 'var(--bg-surface)',
                   border: '1px solid var(--glass-border)',
                   borderRadius: 'var(--radius-md)',
-                  color: 'white'
+                  color: 'var(--text-primary)',
+                  boxShadow: 'var(--shadow-subtle)'
                 }),
                 option: (base, state) => ({
                   ...base,
-                  background: state.isFocused ? 'rgba(139, 92, 246, 0.2)' : 'transparent',
+                  background: state.isFocused ? 'var(--bg-surface-hover)' : 'transparent',
                   color: 'var(--text-primary)',
                   cursor: 'pointer',
+                  ':active': {
+                    background: 'var(--bg-surface-hover)'
+                  }
                 })
               }}
             />
           ) : (
-            <div style={{ height: '46px', width: '100%', background: 'rgba(0, 0, 0, 0.2)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-md)' }} />
+            <div style={{ height: '46px', width: '100%', background: 'var(--bg-base)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-md)' }} />
           )}
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
             Search for locations e.g. "CET", "Europe/London", "America/New_York".

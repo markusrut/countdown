@@ -73,13 +73,9 @@ export const DeleteConfirmationModal = ({ eventName, onConfirm, onCancel, isRemo
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
           <button 
             onClick={onCancel} 
-            className="btn-primary" 
+            className="btn-ghost" 
             style={{ 
               flex: 1, 
-              background: 'transparent', 
-              boxShadow: 'none', 
-              border: '1px solid var(--glass-border)', 
-              color: 'var(--text-secondary)' 
             }}
           >
             Cancel

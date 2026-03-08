@@ -87,7 +87,7 @@ export const CountdownDisplay = ({ event, shareUrl, actionButtons }: Props) => {
           </div>
         )}
         {event.name && (
-          <h1 className="text-gradient" style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+          <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--text-primary)', letterSpacing: '-0.02em', fontWeight: 700 }}>
             {event.name}
           </h1>
         )}
@@ -116,17 +116,18 @@ export const CountdownDisplay = ({ event, shareUrl, actionButtons }: Props) => {
               <div 
                 key={block.label} 
                 style={{
-                  background: timeLeft.isPast ? 'rgba(244, 63, 94, 0.05)' : 'rgba(0, 0, 0, 0.3)',
-                  border: timeLeft.isPast ? '1px solid rgba(244, 63, 94, 0.3)' : '1px solid var(--glass-highlight)',
+                  background: 'var(--bg-base)',
+                  border: `1px solid ${timeLeft.isPast ? 'rgba(239, 68, 68, 0.5)' : 'var(--glass-border)'}`,
                   borderRadius: 'var(--radius-lg)',
                   padding: '1.5rem',
                   minWidth: '100px',
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  boxShadow: 'var(--shadow-subtle)'
                 }}
               >
-                <div style={{ fontSize: '3.5rem', fontWeight: '800', fontFamily: 'var(--font-display)', lineHeight: '1', marginBottom: '0.5rem', color: timeLeft.isPast ? 'var(--color-accent)' : 'inherit' }}>
+                <div style={{ fontSize: '3.5rem', fontWeight: '800', fontFamily: 'var(--font-display)', lineHeight: '1', marginBottom: '0.5rem', color: timeLeft.isPast ? '#ef4444' : 'var(--text-primary)' }}>
                   {displayValue}
                 </div>
                 <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>

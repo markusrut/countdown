@@ -55,8 +55,8 @@ export const PublicCountdownView = ({
       <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', paddingBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
         <Link 
           href="/" 
-          className="btn-primary" 
-          style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: 'transparent', boxShadow: 'none', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          className="btn-ghost" 
+          style={{ textDecoration: 'none'}}
         >
           <ArrowLeft size={16} /> {isOwner && isLoggedIn ? 'My Countdowns' : isLoggedIn ? 'My Countdowns' : 'Create Another'}
         </Link>
@@ -66,15 +66,15 @@ export const PublicCountdownView = ({
             <>
               <a 
                 href={`/c/${eventData.shortCode}/edit`}
-                className="btn-primary" 
-                style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: 'rgba(255,255,255,0.05)', boxShadow: 'none', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                className="btn-ghost" 
+                style={{ textDecoration: 'none' }}
               >
                 <Edit2 size={16} /> Edit
               </a>
               <button 
                 onClick={() => setIsDeleting(true)}
-                className="btn-primary" 
-                style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: 'rgba(239, 68, 68, 0.05)', boxShadow: 'none', border: '1px solid rgba(239, 68, 68, 0.2)', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                className="btn-ghost" 
+                style={{ color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.2)' }}
               >
                 <Trash2 size={16} /> Delete
               </button>
@@ -85,18 +85,11 @@ export const PublicCountdownView = ({
             <button 
               onClick={handleToggleSave}
               disabled={isSaving}
-              className="btn-primary" 
+              className="btn-ghost" 
               style={{ 
-                padding: '0.5rem 1rem',
-                fontSize: '0.9rem',
-                background: isSaved ? 'rgba(16, 185, 129, 0.1)' : 'transparent', 
-                boxShadow: 'none', 
-                border: `1px solid ${isSaved ? 'rgba(16, 185, 129, 0.3)' : 'var(--glass-border)'}`, 
                 color: isSaved ? '#10b981' : 'var(--text-secondary)',
+                borderColor: isSaved ? 'rgba(16, 185, 129, 0.3)' : 'var(--glass-border)',
                 opacity: isSaving ? 0.7 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
               }}
             >
               {isSaved ? <BookmarkCheck size={16} /> : <BookmarkPlus size={16} />} 
@@ -107,8 +100,8 @@ export const PublicCountdownView = ({
           {!isOwner && !isLoggedIn && (
             <Link 
               href="/api/auth/signin" 
-              className="btn-primary" 
-              style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', background: 'transparent', boxShadow: 'none', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              className="btn-ghost" 
+              style={{ textDecoration: 'none' }}
               title="Log in to save"
             >
               <LogIn size={16} /> Log in to save

@@ -13,7 +13,7 @@ export const AuthButton = () => {
         </span>
         <button 
           onClick={() => signOut()} 
-          style={{ background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}
+          className="btn-ghost"
         >
           Sign out
         </button>
@@ -24,7 +24,7 @@ export const AuthButton = () => {
   return (
     <button 
       onClick={() => signIn('github')} 
-      style={{ background: 'var(--color-primary)', border: 'none', color: 'white', padding: '0.5rem 1rem', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 500 }}
+      className="btn-primary"
     >
       Sign in with GitHub
     </button>
